@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Web Audio API を使用した録音、及びWAVファイル出力のデモ - iroha Soft</title>
+	<style type='text/css'>
+		ul { list-style: none; }
+		#recordingslist audio { display: block; margin-bottom: 10px; }
+	</style>
+</head>
+<body>
+	<h2>Web Audio API を使用した録音、及びWAVファイル出力のデモ</h2>
+	
+	※ 録音後、音声ファイル(WAVファイル)がダウンロードできます。<br><br>
+	
+	<button onclick="startRecording(this);">録音</button>
+	<button onclick="stopRecording(this);" disabled>停止</button>
+	
+	<h3>録音ファイル</h3>
+	<ul id="recordingslist"></ul>
+	
+	<h3>ステータス</h3>
+	<pre id="log"></pre>
+
+	<script>
+	function __log(e, data) {
+		log.innerHTML += e + " " + (data || '') + '\n';
+	}
+
+	var audio_context;
+	var recorder;
+
+	function startUserMedia(stream)
+	{
+		var input = audio_context.createMediaStreamSource(stream);
+		__log('Media stream created.');
+		
+		recorder = new Recorder(input);
+		__log('Recorder initialised.');
+	}
+
+	function startRecording(button)
+	{
+		recorder && recorder.record();
+		button.disabled = true;
+		button.nextElementSibling.disabled = false;
+		__log('Recording...');
+	}
+
+	function stopRecording(button)
+	{
+		recorder && recorder.stop();
+		button.disabled = true;
+		button.previousElementSibling.disabled = false;
+		__log('Stopped recording.');
+		
+		createDownloadLink();
+		recorder.clear();
+	}
+
+	function createDownloadLink()
+	{
+		recorder && recorder.exportWAV(function(blob) {
+			var url = URL.createObjectURL(blob);
+			var li = document.createElement('li');
+			var au = document.createElement('audio');
+			var hf = document.createElement('a');
+			
+			au.controls = true;
+			au.src = url;
+			hf.href = url;
+			hf.download = new Date().toISOString() + '.wav';
+			hf.innerHTML = hf.download;
+			li.appendChild(au);
+			li.appendChild(hf);
+			recordingslist.appendChild(li);
+		});
+	}
+
+	window.onload = function init()
+	{
+		try
+		{
+			window.AudioContext = window.AudioContext || window.webkitAudioContext;
+			navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia;
+			window.URL = window.URL || window.webkitURL;
+			
+			audio_context = new AudioContext;
+			__log('Audio context set up.');
+			__log('navigator.getUserMedia ' + (navigator.getUserMedia ? 'available.' : 'not present!'));
+		}
+		catch (e)
+		{
+			alert('No web audio support in this browser!');
+		}
+		
+		navigator.getUserMedia({audio: true}, startUserMedia, function(e) {
+			__log('No live audio input: ' + e);
+		});
+	};
+	</script>
+
+	<script src="../dist/recorder.js"></script>
+</body>
+</html>
