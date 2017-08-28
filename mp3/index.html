@@ -3,7 +3,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>Live input record and playback</title>
+	<title>MP3 録音テスト</title>
   <style type='text/css'>
     ul { list-style: none; }
     #recordingslist audio { display: block; margin-bottom: 10px; }
@@ -12,15 +12,15 @@
 </head>
 <body>
 
-  <h1>Record to MP3 Test</h1>
+  <h1>MP3 録音テスト</h1>
 
-  <button onclick="startRecording(this);">record</button>
-  <button onclick="stopRecording(this);" disabled>stop</button>
+  <button onclick="startRecording(this);">録音</button>
+  <button onclick="stopRecording(this);" disabled>停止</button>
 
-  <h2>Recordings</h2>
+  <h2>録音ファイル</h2>
   <ul id="recordingslist"></ul>
 
-  <h2>Log</h2>
+  <h2>ログ</h2>
   <pre id="log"></pre>
 
   <script>
